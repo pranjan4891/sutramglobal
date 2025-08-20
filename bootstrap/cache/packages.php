@@ -6,49 +6,38 @@
       0 => 'Alexusmai\\LaravelFileManager\\FileManagerServiceProvider',
     ),
   ),
-  'anhskohbo/no-captcha' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Anhskohbo\\NoCaptcha\\NoCaptchaServiceProvider',
-    ),
-    'aliases' => 
-    array (
-      'NoCaptcha' => 'Anhskohbo\\NoCaptcha\\Facades\\NoCaptcha',
-    ),
-  ),
   'barryvdh/laravel-dompdf' => 
   array (
+    'aliases' => 
+    array (
+      'PDF' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
+      'Pdf' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
+    ),
     'providers' => 
     array (
       0 => 'Barryvdh\\DomPDF\\ServiceProvider',
     ),
-    'aliases' => 
-    array (
-      'Pdf' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
-      'PDF' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
-    ),
   ),
   'intervention/image' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Intervention\\Image\\ImageServiceProvider',
-    ),
     'aliases' => 
     array (
       'Image' => 'Intervention\\Image\\Facades\\Image',
     ),
+    'providers' => 
+    array (
+      0 => 'Intervention\\Image\\ImageServiceProvider',
+    ),
   ),
   'josiasmontag/laravel-recaptchav3' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Lunaweb\\RecaptchaV3\\Providers\\RecaptchaV3ServiceProvider',
-    ),
     'aliases' => 
     array (
       'RecaptchaV3' => 'Lunaweb\\RecaptchaV3\\Facades\\RecaptchaV3',
+    ),
+    'providers' => 
+    array (
+      0 => 'Lunaweb\\RecaptchaV3\\Providers\\RecaptchaV3ServiceProvider',
     ),
   ),
   'laravel/sail' => 
@@ -93,13 +82,13 @@
   ),
   'maatwebsite/excel' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Maatwebsite\\Excel\\ExcelServiceProvider',
-    ),
     'aliases' => 
     array (
       'Excel' => 'Maatwebsite\\Excel\\Facades\\Excel',
+    ),
+    'providers' => 
+    array (
+      0 => 'Maatwebsite\\Excel\\ExcelServiceProvider',
     ),
   ),
   'nesbot/carbon' => 
@@ -125,13 +114,13 @@
   ),
   'spatie/laravel-ignition' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
-    ),
     'aliases' => 
     array (
       'Flare' => 'Spatie\\LaravelIgnition\\Facades\\Flare',
+    ),
+    'providers' => 
+    array (
+      0 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
     ),
   ),
   'spatie/laravel-permission' => 
