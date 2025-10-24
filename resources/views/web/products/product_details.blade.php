@@ -349,30 +349,23 @@ img.card-img-top {
             </div>
             <!--coupon code start -->
 
-                    <div class="d-flex ">
-                        @if ($coupons)
-                            @if ($product->category_id )
-                                    <div class="me-3 coupontitle">
-                                    <i class="fa-solid fa-money-bill" style="font-size:30px;"></i>
-                                    </div>
-                                    <div class="pb-3">
-                                        Use code <b>{{ $coupons->code }}</b> at checkout to get {{ $coupons->discount_value }}
-                                        @if($coupons->discount_type == 'percentage')
-                                            % off
-                                        @else
-                                            INR off
-                                        @endif
-                                    </div>
+            <div class="d-flex ">
+                @if ($coupons)
 
-                            @else
-
-                        <!--<div class="me-3 coupontitle">-->
-                        <!--<i class="fa-solid fa-money-bill" style="font-size:30px; color: green"></i>-->
-                        <!--</div>-->
-                        <!--<div class="pb-3" style="color: green;font-weight: 600;">* Buy One Get One Free *</div>-->
-                        @endif
+                    <div class="me-3 coupontitle">
+                        <i class="fa-solid fa-money-bill" style="font-size:30px;"></i>
+                    </div>
+                    <div class="pb-3">
+                        Use code <b>{{ $coupons->code }}</b> at checkout to get {{ $coupons->discount_value }}
+                        @if($coupons->discount_type == 'percentage')
+                            % off
+                        @else
+                            INR off
                         @endif
                     </div>
+
+                @endif
+            </div>
 
 
             <!--coupon code end -->

@@ -234,9 +234,16 @@ class ProductController extends Controller
             ->get();
 
         // Check coupon
-        $data['coupons'] = Coupon::where('status', 1)
+        $coupons = Coupon::where('status', 1)
             ->whereDate('end_date', '>=', now()) // Check if the coupon is still valid
-            ->first();
+            ->get();
+
+        $data['coupons'] = $coupons->filter(function ($coupon) use ($product) {
+            $allowedCategories = !empty($coupon->allow_category) ? explode(',', $coupon->allow_category) : null;
+            // If allow_category is NULL or empty, apply coupon to all products
+            // Otherwise, check if product's category_id is in the allowed categories
+            return $allowedCategories === null || in_array($product->category_id, $allowedCategories);
+        })->first();
 
         return view('web.products.product_details', $data);
     }
