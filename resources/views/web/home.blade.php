@@ -39,9 +39,6 @@
     </div>
 </section>
 
-
-
-
 <!-- product section start -->
 <section class="py-4">
     <div class="container-fluid">
@@ -50,230 +47,93 @@
                 <h2>BEST PRODUCTS FOR YOU</h2>
             </div>
             <ul class="nav nav-tabs text-center" id="myTab" role="tablist">
+                @foreach($categories as $index => $category)
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab" aria-controls="tab1" aria-selected="true">MEN</button>
+                    <button class="nav-link {{ $index == 0 ? 'active' : '' }}" id="tab{{ $category->id }}-tab" data-bs-toggle="tab" data-bs-target="#tab{{ $category->id }}" type="button" role="tab" aria-controls="tab{{ $category->id }}" aria-selected="{{ $index == 0 ? 'true' : 'false' }}">{{ strtoupper($category->name) }}</button>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab" aria-controls="tab2" aria-selected="false">WOMEN</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tab3-tab" data-bs-toggle="tab" data-bs-target="#tab3" type="button" role="tab" aria-controls="tab3" aria-selected="false">PERFUME</button>
-                </li>
+                @endforeach
             </ul>
             <!-- Tab content -->
             <div class="tab-content mt-3" id="myTabContent">
-                <!-- Men Category Products -->
-                <div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+                @foreach($categories as $index => $category)
+                <div class="tab-pane fade {{ $index == 0 ? 'show active' : '' }}" id="tab{{ $category->id }}" role="tabpanel" aria-labelledby="tab{{ $category->id }}-tab">
                     <div class="container-fluid">
                         <div class="row pt-3">
-                            @foreach($menProducts as $product)
-                            <div class="col-md-3 col-6">
-                                <div class="card">
-                                    <a href="{{ route('product.details', ['productSlug' => $product->slug]) }}">
-                                        <img src="{{ isImage('products', $product->image_1) }}" class="card-img-top" alt="{{ $product->name }}">
-                                    </a>
-                                    <div class="card-body p-0">
-                                        <div class="d-flex titles pt-3">
-                                            <div class="cardtitlefont">
-                                                <h5 class="card-title text-start ">{{ $product->title }}</h5>
-                                                <h6 class="text-start newsize">{{ $product->sub_title }}</h6>
+                            @if(isset($categoryProducts[$category->id]) && count($categoryProducts[$category->id]) > 0)
+                                @foreach($categoryProducts[$category->id] as $product)
+                                <div class="col-md-3 col-6">
+                                    <div class="card">
+                                        <a href="{{ route('product.details', ['productSlug' => $product->slug]) }}">
+                                            <img src="{{ isImage('products', $product->image_1) }}" class="card-img-top" alt="{{ $product->name }}">
+                                        </a>
+                                        <div class="card-body p-0">
+                                            <div class="d-flex titles pt-3">
+                                                <div class="cardtitlefont">
+                                                    <h5 class="card-title text-start ">{{ $product->title }}</h5>
+                                                    <h6 class="text-start newsize">{{ $product->sub_title }}</h6>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-heart toggle-heart {{ $product->isInWishlist ? 'fa-solid red-heart' : 'fa-regular' }}"
+                                                        data-product-id="{{ $product->id }}"
+                                                        data-product-color-id="{{ $product->variants->first()->color->id ?? '' }}"
+                                                        data-product-size-id="{{ $product->variants->first()->size->id ?? '' }}">
+                                                     </i>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <i class="fa-heart toggle-heart {{ $product->isInWishlist ? 'fa-solid red-heart' : 'fa-regular' }}"
-                                                    data-product-id="{{ $product->id }}"
-                                                    data-product-color-id="{{ $product->variants->first()->color->id ?? '' }}"
-                                                    data-product-size-id="{{ $product->variants->first()->size->id ?? '' }}">
-                                                 </i>
+                                            <div id="alert-message{{ $product->id }}" class="alert alert-success d-none" role="alert"></div>
 
+                                            <div class="d-flex">
+                                                <div>
+                                                    {{-- <p class="card-text">
+                                                        <strike>INR {{ $product->originalPrices }}</strike>
+                                                    </p> --}}
+                                                </div>
+                                                <div class="">
+                                                  <p class="card-text">INR {{ $product->originalPrices[0] ?? 'N/A' }}</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div id="alert-message{{ $product->id }}" class="alert alert-success d-none" role="alert"></div>
 
-                                        <div class="d-flex">
-                                            <div>
-                                                {{-- <p class="card-text">
-                                                    <strike>INR {{ $product->originalPrices }}</strike>
-                                                </p> --}}
-                                            </div>
-                                            <div class="">
-                                              <p class="card-text">INR {{ $product->originalPrices[0] ?? 'N/A' }}</p>
-                                            </div>
-                                        </div>
+                                            <div class="d-flex titles">
+                                                <div>
+                                                    <ul class="sizelist">
+                                                        @if($product->sizeCodes)
+                                                            @foreach($product->sizeCodes as $sizeCode)
+                                                                <li>{{ $sizeCode }}</li>
+                                                            @endforeach
+                                                        @else
+                                                            <li>No size available</li>
+                                                        @endif
+                                                    </ul>
+                                                </div>
 
-                                        <div class="d-flex titles">
-                                            <div>
-                                                <ul class="sizelist">
-                                                    @if($product->sizeCodes)
-                                                        @foreach($product->sizeCodes as $sizeCode)
-                                                            <li>{{ $sizeCode }}</li>
+                                                <div class="colorbox d-flex ml-3">
+                                                    @if($product->colorData)
+                                                        @foreach($product->colorData as $colorName => $colorHex)
+                                                            <div class="div{{ $loop->index + 1 }}" style="background-color: {{ $colorHex }}" title="{{ $colorName }}"></div>
                                                         @endforeach
                                                     @else
-                                                        <li>No size available</li>
+                                                        <div>No color available</div>
                                                     @endif
-                                                </ul>
-                                            </div>
-
-                                            <div class="colorbox d-flex ml-3">
-                                                @if($product->colorData)
-                                                    @foreach($product->colorData as $colorName => $colorHex)
-                                                        <div class="div{{ $loop->index + 1 }}" style="background-color: {{ $colorHex }}" title="{{ $colorName }}"></div>
-                                                    @endforeach
-                                                @else
-                                                    <div>No color available</div>
-                                                @endif
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            @endforeach
+                                @endforeach
+                            @else
+                                <div class="col-12 text-center">
+                                    <p>No products available for this category.</p>
+                                </div>
+                            @endif
                         </div>
                         <div class="text-center pt-5">
-                            <a href="{{ url('/products/men') }}">
+                            <a href="{{ url('/products/' . strtolower($category->name)) }}">
                                 <div class="btn btn-dark">Explore More</div>
                             </a>
                         </div>
                     </div>
                 </div>
-
-                <div class="tab-pane fade" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
-                    <div class="container-fluid">
-                        <div class="row pt-3">
-                            @foreach($womenProducts as $product)
-                            <div class="col-md-3 col-6">
-                                <div class="card">
-                                    <a href="{{ route('product.details', ['productSlug' => $product->slug]) }}">
-                                        <img src="{{ isImage('products', $product->image_1) }}" class="card-img-top" alt="{{ $product->name }}">
-                                    </a>
-                                    <div class="card-body p-0">
-                                        <div class="d-flex titles pt-3">
-                                            <div class="cardtitlefont">
-                                                <h5 class="card-title text-start ">{{ $product->title }}</h5>
-                                                <h6 class="text-start newsize">{{ $product->sub_title }}</h6>
-                                            </div>
-                                            <div>
-                                                <i class="fa-heart toggle-heart {{ $product->isInWishlist ? 'fa-solid red-heart' : 'fa-regular' }}"
-                                                   data-product-id="{{ $product->id }}"
-                                                   data-product-color="{{ $product->colorData ? array_key_first($product->colorData) : '' }}"
-                                                   data-product-size="{{ $product->sizeCodes ? $product->sizeCodes[0] : '' }}">
-                                                </i>
-                                            </div>
-                                        </div>
-                                        <div id="alert-message{{ $product->id }}" class="alert alert-success d-none" role="alert"></div>
-                                        <div class="d-flex">
-                                            <div>
-
-                                            </div>
-                                            <div class="">
-                                              <p class="card-text">INR {{ $product->originalPrices[0] ?? 'N/A' }}</p>
-                                            </div>
-                                        </div>
-
-                                        <div class="d-flex titles">
-                                            <div>
-                                                <ul class="sizelist">
-                                                    @if($product->sizeCodes)
-                                                        @foreach($product->sizeCodes as $sizeCode)
-                                                            <li>{{ $sizeCode }}</li>
-                                                        @endforeach
-                                                    @else
-                                                        <li>No size available</li>
-                                                    @endif
-                                                </ul>
-                                            </div>
-
-                                            <div class="colorbox d-flex ml-3">
-                                                @if($product->colorData)
-                                                    @foreach($product->colorData as $colorName => $colorHex)
-                                                        <div class="div{{ $loop->index + 1 }}" style="background-color: {{ $colorHex }}" title="{{ $colorName }}"></div>
-                                                    @endforeach
-                                                @else
-                                                    <div>No color available</div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                        <div class="text-center pt-5">
-                            <a href="{{ url('/products/women') }}">
-                                <div class="btn btn-dark">Explore More</div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tab-pane fade" id="tab3" role="tabpanel" aria-labelledby="tab3-tab">
-                    <div class="container-fluid">
-                        <div class="row pt-3">
-                            @foreach($perfumeProducts as $product)
-                            <div class="col-md-3 col-6">
-                                <div class="card">
-                                    <a href="{{ route('product.details', ['productSlug' => $product->slug]) }}">
-                                        <img src="{{ isImage('products', $product->image_1) }}" class="card-img-top" alt="{{ $product->name }}">
-                                    </a>
-                                    <div class="card-body p-0">
-                                        <div class="d-flex titles pt-3">
-                                            <div class="cardtitlefont">
-                                                <h5 class="card-title text-start ">{{ $product->title }}</h5>
-                                                <h6 class="text-start newsize">{{ $product->sub_title }}</h6>
-                                            </div>
-                                            <div>
-                                                <i class="fa-heart toggle-heart {{ $product->isInWishlist ? 'fa-solid red-heart' : 'fa-regular' }}"
-                                                   data-product-id="{{ $product->id }}"
-                                                   data-product-color="{{ $product->colorData ? array_key_first($product->colorData) : '' }}"
-                                                   data-product-size="{{ $product->sizeCodes ? $product->sizeCodes[0] : '' }}">
-                                                </i>
-                                            </div>
-                                        </div>
-                                        <div id="alert-message{{ $product->id }}" class="alert alert-success d-none" role="alert"></div>
-                                        <div class="d-flex">
-                                            <div>
-                                                {{-- <p class="card-text">
-                                                    <strike>INR {{ $product->originalPrices }}</strike>
-                                                </p> --}}
-                                            </div>
-                                            <div class="">
-                                              <p class="card-text">INR {{ $product->originalPrices[0] ?? 'N/A' }}</p>
-                                            </div>
-                                        </div>
-
-                                        <div class="d-flex titles">
-                                            <div>
-                                                <ul class="sizelist">
-                                                    @if($product->sizeCodes)
-                                                        @foreach($product->sizeCodes as $sizeCode)
-                                                            <li>{{ $sizeCode }}</li>
-                                                        @endforeach
-
-                                                    @endif
-                                                </ul>
-                                            </div>
-
-                                            <!-- <div class="colorbox d-flex ml-3">
-                                                @if($product->colorData)
-                                                    @foreach($product->colorData as $colorName => $colorHex)
-                                                        <div class="div{{ $loop->index + 1 }}" style="background-color: {{ $colorHex }}" title="{{ $colorName }}"></div>
-                                                    @endforeach
-
-                                                @endif
-                                            </div> -->
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                        <div class="text-center pt-5">
-                            <a href="{{ url('/products/perfume') }}">
-                                <div class="btn btn-dark">Explore More</div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
+                @endforeach
             </div>
         </div>
     </div>

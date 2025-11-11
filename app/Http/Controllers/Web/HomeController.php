@@ -26,6 +26,31 @@ use Illuminate\Support\Facades\Log;
 class HomeController extends Controller
 {
 
+    private function getProductsForCategory($categoryId, $user_id)
+    {
+        return Product::with(['variants.color', 'variants.size' => function ($query) {
+            $query->orderBy('sort', 'asc'); // Order sizes by sort ascending
+        }])
+        ->where('category_id', $categoryId)
+        ->where('status', 1)
+        ->inRandomOrder()
+        ->take(4)
+        ->get()
+        ->map(function ($product) use ($user_id) {
+            $product->sizeCodes = $product->variants->pluck('size.code')->unique()->toArray(); // Get unique size codes
+            $product->colorData = $product->variants->mapWithKeys(function ($variant) {
+                return [$variant->color->name ?? 'Unknown' => $variant->color->code ?? 'Unknown'];
+            })->toArray(); // Map color names to their codes
+            $product->originalPrices = $product->variants->pluck('original_price')->unique()->toArray(); // Get original prices from variants
+            $product->isInWishlist = $user_id
+                ? Wishlist::where('user_id', $user_id)
+                    ->where('product_id', $product->id)
+                    ->exists()
+                : false;
+            return $product;
+        });
+    }
+
     public function index()
     {
         // Prepare data for the home page
@@ -41,82 +66,18 @@ class HomeController extends Controller
         // Check if the user is logged in
         $user_id = Auth::check() ? Auth::user()->id : null;
 
-        // Fetch Men Products
-       // Fetch Men Products
-        $menProducts = Product::with(['variants.color', 'variants.size' => function ($query) {
-            $query->orderBy('sort', 'asc'); // Order sizes by sort ascending
-        }])
-        ->where('category_id', 1)
-        ->where('status', 1)
-        ->inRandomOrder()
-        ->take(4)
-        ->get()
-        ->map(function ($product) use ($user_id) {
-            $product->sizeCodes = $product->variants->pluck('size.code')->unique()->toArray(); // Get unique size codes
-            $product->colorData = $product->variants->mapWithKeys(function ($variant) {
-                return [$variant->color->name ?? 'Unknown' => $variant->color->code ?? 'Unknown'];
-            })->toArray(); // Map color names to their codes
-            $product->originalPrices = $product->variants->pluck('original_price')->unique()->toArray(); // Get original prices from variants
-            $product->isInWishlist = $user_id
-                ? Wishlist::where('user_id', $user_id)
-                    ->where('product_id', $product->id)
-                    ->exists()
-                : false;
-            return $product;
-        });
+        // Fetch products for all active categories
+        $data['categoryProducts'] = [];
+        foreach ($data['categories'] as $category) {
+            $data['categoryProducts'][$category->id] = $this->getProductsForCategory($category->id, $user_id);
+        }
 
-        // Fetch Women Products
-        $womenProducts = Product::with(['variants.color', 'variants.size'])
-        ->where('category_id', 2)
-        ->where('status', 1)
-        ->inRandomOrder()
-        ->take(4)
-        ->get()
-        ->map(function ($product) use ($user_id) {
-            $product->sizeCodes = $product->variants->pluck('size.code')->unique()->toArray(); // Get unique size codes
-            $product->colorData = $product->variants->mapWithKeys(function ($variant) {
-                return [$variant->color->name ?? 'Unknown' => $variant->color->code ?? 'Unknown'];
-            })->toArray(); // Map color names to their codes
-            $product->originalPrices = $product->variants->pluck('original_price')->unique()->toArray(); // Get original prices from variants
-            $product->isInWishlist = $user_id
-                ? Wishlist::where('user_id', $user_id)
-                    ->where('product_id', $product->id)
-                    ->exists()
-                : false;
-            return $product;
-        });
-
-        // Fetch Perfume Products
-        $perfumeProducts = Product::with(['variants.size'])
-        ->where('category_id', 3)
-        ->where('status', 1)
-        ->inRandomOrder()
-        ->take(4)
-        ->get()
-        ->map(function ($product) use ($user_id) {
-            $product->sizeCodes = $product->variants->pluck('size.code')->unique()->toArray(); // Get unique size codes
-            $product->originalPrices = $product->variants->pluck('original_price')->unique()->toArray(); // Get original prices from variants
-            $product->isInWishlist = $user_id
-                ? Wishlist::where('user_id', $user_id)
-                    ->where('product_id', $product->id)
-                    ->exists()
-                : false;
-            return $product;
-        });
-
-         //   dd($perfumeProducts);
         // Fetch trending products
-
         $data['trends'] = Product::where('trending', 1)
             ->where('status', 1)
             ->inRandomOrder()
             ->take(8)
             ->get();
-
-        // Assign products to view
-        $data['menProducts'] = $menProducts;
-        $data['womenProducts'] = $womenProducts;
-        $data['perfumeProducts'] = $perfumeProducts;
 
         // Return the view with data
         return view('web.home', $data);

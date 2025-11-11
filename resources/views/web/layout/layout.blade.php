@@ -29,6 +29,7 @@ $setting = \App\Models\Setting::find(1);
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
       <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
       <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/css/toastr.css" rel="stylesheet" />
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
       <title>Sutram Global | {{ $pageTitle }}</title>
       <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-NY84H0BP9Z"></script>
@@ -71,6 +72,21 @@ $setting = \App\Models\Setting::find(1);
       </div>
    </div>
    <style>
+   .product-thumbnails{
+       margin-top: 25px;
+   }
+       .buybutton {
+    margin-left: 4px;
+}
+   .nav-link .fa{
+       font-size: 20px;
+   }
+   .nav-link .fas{
+       font-size: 20px;
+   }
+    .nav-link{
+       font-size: 20px;
+   }
       .navbar-dark .navbar-brand {
       padding-top: 9px;
       color: #fff;
@@ -90,7 +106,7 @@ $setting = \App\Models\Setting::find(1);
       left: 0;
       width: 100%;
       z-index: 1030;
-      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      transition: background-color 0.10s ease, box-shadow 0.3s ease;
       }
       /* Style when header is scrolled */
       #site-header.scrolled {
@@ -114,9 +130,11 @@ $setting = \App\Models\Setting::find(1);
       list-style: none;
       }
       .list ul li {
-      margin-right: 20px;
-      cursor: pointer;
-      }
+        margin-right: 30px !important;
+        cursor: pointer;
+        font-size: 20px;
+    }
+
       #site-header {
       position: fixed;
       top: 0px;
@@ -268,6 +286,27 @@ $setting = \App\Models\Setting::find(1);
       .hide-on-desktop {
       display: block;
       }
+      .search-input-box {
+        display: none;
+        position: relative !important;
+        top: 100%;
+        right: 0;
+        margin-top: 8px;
+        width: 280px;
+        background: #000;
+        padding: 10px;
+        border-radius: 6px;
+        z-index: 1000;
+    }
+    .buybutton {
+    margin-left: -203px;
+}
+.product-thumbnails {
+    margin-top: -3px;
+}
+#available-quantity{
+    text-align: start !important;
+}
       }
       /* Hide on mobile */
       @media (max-width: 768px) {
@@ -338,6 +377,49 @@ $setting = \App\Models\Setting::find(1);
             color: #ffffff;
             font-weight: bold;
         }
+          .search-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .search-input-box {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    width: 280px;
+    background: #000;
+    padding: 10px;
+    border-radius: 6px;
+    z-index: 1000;
+  }
+
+  .search-input-box input {
+    width: 100%;
+    border: none;
+    outline: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    background: #222;
+    color: #fff;
+  }
+
+  .search-input-box input::placeholder {
+    color: #aaa;
+  }
+
+  .search-input-box button {
+    display: none; /* hide button, submit on Enter */
+  }
+
+  .search-icon {
+    font-size: 18px;
+    cursor: pointer;
+    color: #000;
+  }
+
+
    </style>
    </head>
    <body>
@@ -346,41 +428,37 @@ $setting = \App\Models\Setting::find(1);
             <span class="cart-title px-4">Products</span>
             <span class="close-btn" onclick="closeSidebar()">&times;</span>
          </div>
-         @if(Auth::check())
-         <!-- Menu items for logged-in users -->
-         <div class="DOTdrop pt-5">
-            <a href="{{ url('products/men') }}">
-               <h6>MENS</h6>
-            </a>
-         </div>
-         <div class="DOTdrop">
-            <a href="{{ url('products/women') }}">
-               <h6>WOMENS</h6>
-            </a>
-         </div>
-         <div class="DOTdrop">
-            <a href="{{ url('products/perfume') }}">
-               <h6>PERFUME</h6>
-            </a>
-         </div>
-         @else
-         <!-- Menu items for guests (not logged in) -->
-         <div class="DOTdrop pt-5">
-            <a href="{{ url('products/men') }}">
-               <h6>MENS</h6>
-            </a>
-         </div>
-         <div class="DOTdrop">
-            <a href="{{ url('products/women') }}">
-               <h6>WOMENS</h6>
-            </a>
-         </div>
-         <div class="DOTdrop">
-            <a href="{{ url('products/perfume') }}">
-               <h6>PERFUME</h6>
-            </a>
-         </div>
+      {{-- 🔹 First 3 fixed menu items --}}
+
+
+         {{-- 🔹 Dynamic categories --}}
+         @if(isset($categories) && $categories->count())
+            @foreach($categories as $category)
+               <div class="DOTdrop">
+                     <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink{{ $category->id }}"
+                           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                           {{ $category->name }}<i class="fa fa-caret-down ms-2"></i>
+                        </a>
+
+
+                        @if($category->subcategories->count())
+                           <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink{{ $category->id }}">
+                                 @foreach($category->subcategories as $subcategory)
+                                    <li>
+                                       <a class="dropdown-item"
+                                          href="{{ url('products/'.$category->slug.'/'.$subcategory->slug) }}">
+                                             {{ $subcategory->name }}
+                                       </a>
+                                    </li>
+                                 @endforeach
+                           </ul>
+                        @endif
+                     </li>
+               </div>
+            @endforeach
          @endif
+
          <!-- Footer with Social Media Links, Email, and Phone -->
          <div class="sidebar-footer">
             <div class="contact-info">
@@ -433,19 +511,40 @@ $setting = \App\Models\Setting::find(1);
                      <button type="button" class="btn text-white" data-bs-dismiss="offcanvas" aria-label="Close">
                         <i class="fas fa-times"></i>
                   </div>
-                  <div class="offcanvas-body ms-auto">
+                  <div class="offcanvas-body ms-auto ">
+
+                     <ul class="navbar-nav d-flex">
+
+
+                        {{-- 🔍 Search icon --}}
+                        <li class="nav-item ">
+                              <a class="nav-link" href="javascript:void(0);" onclick="toggleSearch()">
+                                 <i class="fa">&#xf002;</i>
+                              </a>
+                        </li>
+                     </ul>
+
+
+
                     <!-- Search Form -->
                     <div>
-                        <div>
-                            <form class="d-flex search-box" role="search" action="{{ route('search') }}" method="GET">
-                                <input class="form-control me-2" required type="search" name="keyword" id="search-input" placeholder="Search" aria-label="Search" autocomplete="off">
-                                <button class="btn btn-outline-dark" id="btn-search" type="submit">Search</button>
-                            </form>
-                        </div>
-                        <div>
-                            <!-- Suggestions Dropdown -->
-                            <ul id="search-suggestions" class="list-group position-absolute w-40 "></ul>
-                        </div>
+                  <div class="search-container">
+                  <!-- Search Icon -->
+
+
+                  <!-- Hidden Search Box -->
+                  <div class="search-input-box" id="searchBox">
+                  <form class="search-box" role="search" action="{{ route('search') }}" method="GET">
+                     <input class="form-control me-2" required type="search" name="keyword" id="search-input" placeholder="Search" aria-label="Search" autocomplete="off">
+                     <!--<button class="btn btn-outline-dark" id="btn-search" type="submit">Search</button>-->
+                     <div class="pt-2">
+                        <!-- Suggestions Dropdown -->
+                        <ul id="search-suggestions" class="list-group position-absolute w-40 "></ul>
+                     </div>
+                  </form>
+  </div>
+</div>
+
 
 
                     </div>
@@ -455,12 +554,12 @@ $setting = \App\Models\Setting::find(1);
                   <ul class="navbar-nav p-1">
                   @if(Auth::check())
                   <li class="nav-item">
-                  <a class="nav-link" href="{{ route('profile') }}">Hey {{ Auth::user()->first_name ?? 'User' }}</a>
+                  <a class="nav-link" href="{{ route('profile') }}">{{ Auth::user()->first_name ?? 'User' }}</a>
                   </li>
                   <hr style="color:white;">
 
                   <li class="nav-item">
-                  <a class="nav-link" href="{{ route('wishlist') }}">My Wishlist</a>
+                  <a class="nav-link" href="{{ route('wishlist') }}"> <i class="fas fa-heart"></i></a>
                   </li>
                   <li class="nav-item hide-on-desktop">
                   <a class="nav-link" href="{{route('order.list')}}">My Order</a>
@@ -473,12 +572,13 @@ $setting = \App\Models\Setting::find(1);
                   </li>
                   @else
                   <li class="nav-item">
-                  <a class="nav-link" href="{{ route('weblogin') }}">Login</a>
+                  <a class="nav-link" href="{{ route('weblogin') }}"><i class="fa fa-user"></i>
+</a>
                   </li>
 
                   @endif
                   <li class="nav-item">
-                  <a class="nav-link" href="#" id="openCartBtn">My Cart</a>
+                  <a class="nav-link" href="#" id="openCartBtn"><i class="fa fa-shopping-cart"></i></a>
                   </li>
                   </ul>
                   </div>
@@ -490,6 +590,25 @@ $setting = \App\Models\Setting::find(1);
       {{--
       <div id="alert-message" class="alert d-none"></div>
       --}}
+      <script>
+  function toggleSearch() {
+    let box = document.getElementById("searchBox");
+    box.style.display = (box.style.display === "block") ? "none" : "block";
+
+    if (box.style.display === "block") {
+      box.querySelector("input").focus();
+    }
+  }
+
+  // Close if clicked outside
+  document.addEventListener("click", function(event) {
+    const searchBox = document.getElementById("searchBox");
+    const searchIcon = document.querySelector(".search-icon");
+    if (!searchBox.contains(event.target) && !searchIcon.contains(event.target)) {
+      searchBox.style.display = "none";
+    }
+  });
+</script>
       <script>
          document.addEventListener('scroll', function() {
              var header = document.getElementById("site-header");
@@ -602,12 +721,12 @@ $setting = \App\Models\Setting::find(1);
                </div>
                <div class="col-md-2 shop">
                   <h4 class="text-white">Shop</h4>
-                  <p class="m-1"><a class="" href="{{ url('products/men') }}">Men</p>
-                  </a>
-                  <p class="m-1"><a class="" href="{{ url('products/women') }}">Women</p>
-                  </a>
-                  <p class="m-1"><a class="" href="{{ url('products/perfume') }}">Perfume</p>
-                  </a>
+                  @php
+                     $footerCategories = \App\Models\Category::where('status', 1)->orderBy('order_by', 'asc')->get();
+                  @endphp
+                  @foreach($footerCategories as $category)
+                     <p class="m-1"><a class="" href="{{ url('products/' . $category->slug) }}">{{ $category->name }}</a></p>
+                  @endforeach
                </div>
                <div class="col-md-2 aboutfot">
                   <h4 class="text-white">Quick Links</h4>
