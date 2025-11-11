@@ -36,10 +36,13 @@
                 <div class="col-md-4 pb-4">
                     <div class="card">
                         <!-- Product Detail Page Link -->
-                        <a href="{{ route('product.details', ['productSlug' => $product->slug]) }}">
-                            <!-- Dynamically load product image -->
-                            <img src="{{ isImage('products', $product->image_1) }}" class="card-img-top" alt="{{ $product->title }}">
-                        </a>
+                        <div class="card-img" style="position: relative; overflow: hidden;">
+                            <a href="{{ route('product.details', ['productSlug' => $product->slug]) }}">
+                                <!-- Dynamically load product image -->
+                                <img src="{{ isImage('products', $product->image_1) }}" class="card-img-top" alt="{{ $product->title }}" style="height: 450px; ; width: 100%;">
+                            </a>
+                        </div>
+                        
                         <div class="card-body p-0">
                             <div class="d-flex titles pt-3">
                                 <!-- Product title -->

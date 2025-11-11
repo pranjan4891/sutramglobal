@@ -1,28 +1,47 @@
-      // my cart sidebar
+      // my cart sidebar 
       const cartSidebar = document.getElementById('cartSidebar');
       const openCartBtn = document.getElementById('openCartBtn');
       const closeCartBtn = document.getElementById('closeCartBtn');
-
+   
       // Open cart on button click
       openCartBtn.addEventListener('click', function() {
           cartSidebar.classList.add('open');
       });
-
+   
       // Close cart on close button click
       closeCartBtn.addEventListener('click', function() {
           cartSidebar.classList.remove('open');
       });
-
+   
       // Close cart by clicking outside of it
       window.addEventListener('click', function(event) {
           if (event.target !== cartSidebar && !cartSidebar.contains(event.target) && event.target !== openCartBtn) {
               cartSidebar.classList.remove('open');
           }
       });
+   
+ 
+      
 
 
+// quantity increse 
+// const quantityInput = document.getElementById('quantity');
+// const increaseButton = document.getElementById('increase');
+// const decreaseButton = document.getElementById('decrease');
 
-// product detail image changer
+// increaseButton.addEventListener('click', () => {
+//     let currentValue = parseInt(quantityInput.value);
+//     quantityInput.value = currentValue + 1;
+// });
+
+// decreaseButton.addEventListener('click', () => {
+//     let currentValue = parseInt(quantityInput.value);
+//     if (currentValue > 1) {
+//         quantityInput.value = currentValue - 1;
+//     }
+// });
+
+// product detail image changer 
 function changeImage(element) {
   document.getElementById('mainProductImage').src = element.src;
 }
@@ -45,7 +64,7 @@ function changeImage(element) {
         });
     });
 
-
+ 
 
   // Quantity Increase/Decrease
   const increaseBtns = document.querySelectorAll('.increase-qty');
@@ -68,9 +87,9 @@ function changeImage(element) {
   });
 
 
-// left sidebar by three toggle icon
+// left sidebar by three toggle icon 
 function openSidebar() {
-  document.getElementById("mySidebar").style.width = "250px";
+  document.getElementById("mySidebar").style.width = "280px";
   document.querySelector(".main-content").style.marginLeft = "250px";
 }
 
@@ -81,7 +100,7 @@ function closeSidebar() {
 
 
 
-// addresss js start
+// addresss js start 
 function deleteAddress() {
   if (confirm("Are you sure you want to delete this address?")) {
     // Add your delete action here
@@ -117,7 +136,7 @@ function closeEditForm() {
   document.getElementById('editAddressModal').style.display = 'none';
 }
 
-// address js end
+// address js end 
 
     // Function to open the size guide modal
     function openSizeGuide() {
@@ -136,6 +155,19 @@ function closeEditForm() {
           closeSizeGuide();
       }
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // for event secton tab
@@ -176,22 +208,22 @@ window.onload = function () {
   }
 };
 
-// document.querySelector('.tablink').classList.add('active');
+document.querySelector('.tablink').classList.add('active');
 
-//   function openTab(event, tabName) {
-//     var i, tabcontent, tablinks;
-//     tabcontent = document.getElementsByClassName("tab-content");
-//     tabcontent[1].style.display = "show";
-//     for (i = 0; i < tabcontent.length; i++) {
-//       tabcontent[i].style.display = "none";
-//     }
-//     tablinks = document.getElementsByClassName("tablink");
-//     for (i = 0; i < tablinks.length; i++) {
-//       tablinks[i].classList.remove("active");
-//     }
-//     document.getElementById(tabName).style.display = "block";
-//     event.currentTarget.classList.add("active");
-//   }
+  function openTab(event, tabName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tab-content");
+    tabcontent[1].style.display = "show";
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablink");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].classList.remove("active");
+    }
+    document.getElementById(tabName).style.display = "block";
+    event.currentTarget.classList.add("active");
+  }
 
 /*------------------ slider-------------------- */
 $(document).ready(function()  {
@@ -228,12 +260,12 @@ function scrollToTop(){
 };
  // Function to scroll smooth end
 
-
+ 
    // Function to open the popup button form
    function openEnquiryForm() {
     document.getElementById('enquiryForm').style.display = 'block';
   }
-
+  
   // Function to close the popup form
   function closeEnquiryForm() {
     document.getElementById('enquiryForm').style.display = 'none';
@@ -245,7 +277,7 @@ function scrollToTop(){
   document.addEventListener("DOMContentLoaded", function(){
     // make it as accordion for smaller screens
     if (window.innerWidth < 992) {
-
+    
       // close all inner dropdowns when parent is closed
       document.querySelectorAll('.navbar .dropdown').forEach(function(everydropdown){
         everydropdown.addEventListener('hidden.bs.dropdown', function () {
@@ -256,11 +288,11 @@ function scrollToTop(){
             });
         })
       });
-
+    
       document.querySelectorAll('.dropdown-menu a').forEach(function(element){
         element.addEventListener('click', function (e) {
             let nextEl = this.nextElementSibling;
-            if(nextEl && nextEl.classList.contains('submenu')) {
+            if(nextEl && nextEl.classList.contains('submenu')) {	
               // prevent opening link if link needs to open dropdown
               e.preventDefault();
               if(nextEl.style.display == 'block'){
@@ -268,11 +300,12 @@ function scrollToTop(){
               } else {
                 nextEl.style.display = 'block';
               }
-
+    
             }
         });
       })
     }
     // end if innerWidth
-    });
+    }); 
 
+  

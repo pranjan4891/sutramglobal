@@ -18,8 +18,8 @@ body {
     width: 410px;
 }
 .logos {
-    height: 65px;
-    width: 370px;
+    height: 45px;
+    width: 320px;
     margin-left: -12px;
 }
 /* To ensure no content jumps when the header becomes fixed */
@@ -183,7 +183,7 @@ a {
     padding-bottom: 40px;
 }
 .blacksection{
-    background-color:black;
+   background-color: black;
     padding-top:130px;
 }
 .card-text{
@@ -191,7 +191,7 @@ a {
 }
 .card-text span{
     font-size: 20px;
-    margin-left: 10px;
+    /*margin-left: 10px;*/
 }
 .colorbox p{
     color:#47A235;
@@ -804,6 +804,7 @@ textarea {
     border-radius: 0;
     padding: 8px;
     box-shadow: none;
+    margin-left:0px;
   }
 
   .form-control:focus {
@@ -985,10 +986,7 @@ border-top: 0px solid currentColor;
 .dropdown-toggle::after {
     display: none;
 }
-.headdrop a{
-    text-decoration: none;
-    color: white;
-}
+
 .headdrop .dropdown-item{
     color: black;
 }
@@ -1084,7 +1082,7 @@ border-top: 0px solid currentColor;
     border-radius: 5px;
 }
 .blacksection {
-    background-color: black;
+   background-color: #0000006b;
     padding-top: 70px;
 }
 .btn {

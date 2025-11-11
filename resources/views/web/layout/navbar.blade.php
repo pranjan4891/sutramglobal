@@ -35,7 +35,7 @@
             @foreach($categories as $category)
                 <li class="nav-item dropdown p-0 m-0 headdrop" >
                     <a class="nav-link dropdown-toggle p-0 mx-2" href="#" id="navbarDropdownMenuLink{{ $category->id }}" role="button" data-bs-toggle="dropdown" aria-expanded="false" >
-                        {{ $category->name }}
+                        {{ $category->name }} <i class="fa fa-caret-down ms-1"></i>
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink{{ $category->id }}">
                         @foreach($category->subcategories as $subcategory)
@@ -44,9 +44,32 @@
                     </ul>
                 </li>
             @endforeach
-
-
+               
+                <!-- <li class="nav-item">-->
+                <!--  <a class="nav-link" href="#" id="" onclick="toggleSearch()"><i class="fa">&#xf002;</i></a>-->
+                <!--</li>-->
         </ul>
         @endif
     </div>
 </nav>
+{{-- <li class="nav-item">
+                  <a class="nav-link" href="#" id="">Polo<i class="fa fa-caret-down ms-1"></i></a>
+                  </li>
+                  <li class="nav-item">
+                  <a class="nav-link" href="#" id="">CrewNecks<i class="fa fa-caret-down ms-1"></i></a>
+                  </li>
+                  <li class="nav-item">
+                  <a class="nav-link" href="#" id="">Perfumes<i class="fa fa-caret-down ms-1"></i></a>
+                  </li>
+                  <li class="nav-item">
+                  <a class="nav-link" href="#" id="">Shirts<i class="fa fa-caret-down ms-1"></i></a>
+                  </li>
+                  <li class="nav-item">
+                  <a class="nav-link" href="#" id="">Hoodies&nbsp;Sweatshirts&nbsp;Jackets<i class="fa fa-caret-down ms-1"></i></a>
+                  </li>
+                  <li class="nav-item">
+                  <a class="nav-link" href="#" id="">Print&nbsp;On&nbsp;Demand&nbsp;Tees<i class="fa fa-caret-down ms-1"></i></a>
+                  </li>
+                   <li class="nav-item">
+                  <a class="nav-link" href="#" id="" onclick="toggleSearch()"><i class="fa">&#xf002;</i></a>
+                  </li> --}}

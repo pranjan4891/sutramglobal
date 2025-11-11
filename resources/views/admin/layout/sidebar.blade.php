@@ -81,6 +81,12 @@
                                 <p>Slider</p>
                             </a>
                         </li>
+                         <li class="nav-item">
+                            <a href="{{ route('admin.masters.printDesigns') }}" class="nav-link {{ $menu . '/' . $subMenu == 'masters/print-designs' ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Print Designs</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 <li class="nav-item">

@@ -47,16 +47,22 @@
                 <h2>BEST PRODUCTS FOR YOU</h2>
             </div>
             <ul class="nav nav-tabs text-center" id="myTab" role="tablist">
-                @foreach($categories as $index => $category)
+                @php $tabIndex = 0; @endphp
+                @foreach($categories as $category)
+                @if($category->id != 8)
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link {{ $index == 0 ? 'active' : '' }}" id="tab{{ $category->id }}-tab" data-bs-toggle="tab" data-bs-target="#tab{{ $category->id }}" type="button" role="tab" aria-controls="tab{{ $category->id }}" aria-selected="{{ $index == 0 ? 'true' : 'false' }}">{{ strtoupper($category->name) }}</button>
+                    <button class="nav-link {{ $tabIndex == 0 ? 'active' : '' }}" id="tab{{ $category->id }}-tab" data-bs-toggle="tab" data-bs-target="#tab{{ $category->id }}" type="button" role="tab" aria-controls="tab{{ $category->id }}" aria-selected="{{ $tabIndex == 0 ? 'true' : 'false' }}">{{ strtoupper($category->name) }}</button>
                 </li>
+                @php $tabIndex++; @endphp
+                @endif
                 @endforeach
             </ul>
             <!-- Tab content -->
             <div class="tab-content mt-3" id="myTabContent">
-                @foreach($categories as $index => $category)
-                <div class="tab-pane fade {{ $index == 0 ? 'show active' : '' }}" id="tab{{ $category->id }}" role="tabpanel" aria-labelledby="tab{{ $category->id }}-tab">
+                @php $contentIndex = 0; @endphp
+                @foreach($categories as $category)
+                @if($category->id != 8)
+                <div class="tab-pane fade {{ $contentIndex == 0 ? 'show active' : '' }}" id="tab{{ $category->id }}" role="tabpanel" aria-labelledby="tab{{ $category->id }}-tab">
                     <div class="container-fluid">
                         <div class="row pt-3">
                             @if(isset($categoryProducts[$category->id]) && count($categoryProducts[$category->id]) > 0)
@@ -133,6 +139,8 @@
                         </div>
                     </div>
                 </div>
+                @php $contentIndex++; @endphp
+                @endif
                 @endforeach
             </div>
         </div>
