@@ -14,7 +14,6 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrdersController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\PrintDesignController;
 
 Route::group(['prefix' => 'admin'], function () {
 
@@ -171,6 +170,21 @@ Route::group(['prefix' => 'admin'], function () {
             });
 
 
+            // routes/web.php (inside admin prefix/group as your pattern)
+                Route::prefix('print-designs')->group(function () {
+                    Route::get('/', [\App\Http\Controllers\Admin\PrintDesignController::class,'index'])->name('admin.masters.printDesigns');
+                    Route::post('list', [\App\Http\Controllers\Admin\PrintDesignController::class,'getList'])->name('admin.masters.getPrintDesignList');
+                    Route::post('store', [\App\Http\Controllers\Admin\PrintDesignController::class,'store'])->name('admin.masters.printDesignStore');
+                    Route::get('edit/{id}', [\App\Http\Controllers\Admin\PrintDesignController::class,'edit'])->name('admin.masters.printDesignEdit');
+                    Route::post('delete', [\App\Http\Controllers\Admin\PrintDesignController::class,'delete'])->name('admin.masters.printDesignDelete');
+                    Route::post('status', [\App\Http\Controllers\Admin\PrintDesignController::class,'status'])->name('admin.masters.printDesignStatus');
+
+                    // helper: fetch subcategories for a category (AJAX)
+                    Route::post('get-subcategories', [\App\Http\Controllers\Admin\PrintDesignController::class,'getSubcategories'])->name('admin.masters.getSubcategories');
+                });
+
+
+
 
             Route::prefix('/sliders')->group(function () {
                 Route::get('/', [MastersController::class, 'slider'])->name('admin.masters.slider');
@@ -180,16 +194,6 @@ Route::group(['prefix' => 'admin'], function () {
                 Route::post('delete', [MastersController::class, 'sliderDelete'])->name('admin.masters.sliderDelete');
                 Route::post('status', [MastersController::class, 'sliderStatus'])->name('admin.masters.sliderStatus');
 
-            });
-
-            Route::prefix('/print-designs')->group(function () {
-                Route::get('/', [PrintDesignController::class, 'index'])->name('admin.masters.printDesigns');
-                Route::post('list', [PrintDesignController::class, 'getList'])->name('admin.masters.getPrintDesignList');
-                Route::post('store', [PrintDesignController::class, 'store'])->name('admin.masters.printDesignStore');
-                Route::get('edit/{id}', [PrintDesignController::class, 'edit'])->name('admin.masters.printDesignEdit');
-                Route::post('delete', [PrintDesignController::class, 'delete'])->name('admin.masters.printDesignDelete');
-                Route::post('status', [PrintDesignController::class, 'status'])->name('admin.masters.printDesignStatus');
-                Route::post('get-subcategories', [PrintDesignController::class, 'getSubcategories'])->name('admin.masters.getSubcategories');
             });
 
         });
@@ -213,3 +217,4 @@ Route::group(['prefix' => 'admin'], function () {
     });
 
 });
+

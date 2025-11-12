@@ -23,76 +23,93 @@ class ShiprocketService
     public function authenticate()
     {
         try {
+            // 🚫 Prevent repeated attempts if we recently got blocked
+            if (Cache::has('shiprocket_blocked')) {
+                $ttl = Cache::ttl('shiprocket_blocked');
+                Log::warning("Shiprocket authentication temporarily blocked. Will retry after {$ttl} seconds.");
+                throw new Exception('Shiprocket authentication temporarily blocked. Please wait before retrying.');
+            }
+
+            // ✅ Reuse cached token if exists
             $this->token = Cache::get('shiprocket_token');
+            if ($this->token) {
+                Log::info('Using cached Shiprocket token.');
+                return;
+            }
+
+            Log::info('No cached token found. Attempting to authenticate with Shiprocket.');
+
+            // ⏳ Send login request
+            $response = Http::timeout(30)
+                ->retry(3, 2000)
+                ->post("{$this->baseUrl}/auth/login", [
+                    'email' => env('SHIPROCKET_EMAIL'),
+                    'password' => env('SHIPROCKET_PASSWORD'),
+                ]);
+
+            // ❌ Handle failed responses
+            if ($response->failed()) {
+                $status = $response->status();
+                $body = $response->body();
+
+                Log::error("Shiprocket authentication failed [HTTP {$status}]: {$body}");
+
+                // If Shiprocket blocked due to failed logins, back off for 15 mins
+                if ($status === 403 && str_contains($body, 'User blocked')) {
+                    Cache::put('shiprocket_blocked', true, now()->addMinutes(15));
+                    throw new Exception('Shiprocket account temporarily blocked due to too many login attempts.');
+                }
+
+                throw new Exception("Failed to authenticate with Shiprocket. HTTP {$status}");
+            }
+
+            $data = $response->json();
+            $this->token = $data['token'] ?? null;
 
             if (!$this->token) {
-                Log::info('No cached token found. Attempting to authenticate with Shiprocket.');
-
-                $response = Http::timeout(30)
-                    ->retry(3, 2000)
-                    ->post("{$this->baseUrl}/auth/login", [
-                        'email' => env('SHIPROCKET_EMAIL'),
-                        'password' => env('SHIPROCKET_PASSWORD'),
-                    ]);
-
-                if ($response->failed()) {
-                    Log::error('Shiprocket authentication failed with status ' . $response->status() . ': ' . $response->body());
-                    throw new Exception('Failed to authenticate with Shiprocket.');
-                }
-
-                $data = $response->json();
-                $this->token = $data['token'] ?? null;
-
-                if (!$this->token) {
-                    Log::error('Shiprocket authentication response does not contain a token.');
-                    throw new Exception('Failed to retrieve Shiprocket token.');
-                }
-
-                Cache::put('shiprocket_token', $this->token, now()->addHour());
-                Log::info('Shiprocket authenticated successfully. Token cached.');
-            } else {
-                Log::info('Using cached Shiprocket token.');
+                Log::error('Shiprocket authentication response missing token. Response: ' . $response->body());
+                throw new Exception('Failed to retrieve Shiprocket token.');
             }
+
+            // ✅ Cache token for 1 hour
+            Cache::put('shiprocket_token', $this->token, now()->addHour());
+            Log::info('Shiprocket authenticated successfully. Token cached.');
+
         } catch (Exception $e) {
             Log::error('Error during Shiprocket authentication: ' . $e->getMessage());
-            throw new Exception('Shiprocket authentication failed.');
+            throw new Exception('Shiprocket authentication failed: ' . $e->getMessage());
         }
     }
 
     /**
      * Create an order in Shiprocket.
-     *
-     * @param  array  $orderData
-     * @return array
      */
     public function createOrder(array $orderData)
     {
         try {
+            if (!$this->token) {
+                $this->authenticate();
+            }
+
             $response = Http::withToken($this->token)
                 ->post("{$this->baseUrl}/orders/create/adhoc", $orderData);
 
             $data = $response->json();
             Log::info('Shiprocket Create Order Response:', $data);
 
-            if ($response->successful()) {
-                if (isset($data['shipment_id'])) {
-                    return [
-                        'success' => true,
-                        'shipment_id' => $data['shipment_id'],
-                        'awb_code' => $data['awb_code'] ?? null,
-                    ];
-                } else {
-                    return [
-                        'success' => false,
-                        'message' => 'Shipment ID not returned.',
-                    ];
-                }
-            } else {
+            if ($response->successful() && isset($data['shipment_id'])) {
                 return [
-                    'success' => false,
-                    'message' => $data['message'] ?? 'Unknown error',
+                    'success' => true,
+                    'shipment_id' => $data['shipment_id'],
+                    'awb_code' => $data['awb_code'] ?? null,
                 ];
             }
+
+            return [
+                'success' => false,
+                'message' => $data['message'] ?? 'Unknown error while creating order.',
+            ];
+
         } catch (Exception $e) {
             Log::error('Error during Shiprocket order creation: ' . $e->getMessage());
             return [
@@ -104,13 +121,14 @@ class ShiprocketService
 
     /**
      * Fetch shipment details from Shiprocket.
-     *
-     * @param  string  $shipmentId
-     * @return array
      */
     public function fetchShipmentDetails($shipmentId)
     {
         try {
+            if (!$this->token) {
+                $this->authenticate();
+            }
+
             $response = Http::withToken($this->token)
                 ->get("{$this->baseUrl}/shipments/{$shipmentId}");
 
@@ -119,12 +137,13 @@ class ShiprocketService
 
             if ($response->successful() && isset($data['awb_code']) && !empty($data['awb_code'])) {
                 return $data;
-            } else {
-                Log::warning('AWB Code is still not generated for Shipment ID: ' . $shipmentId);
-                return ['message' => 'AWB Code not yet available', 'awb_code' => null];
             }
+
+            Log::warning("AWB Code not yet generated for Shipment ID: {$shipmentId}");
+            return ['message' => 'AWB Code not yet available', 'awb_code' => null];
+
         } catch (Exception $e) {
-            Log::error('Error while fetching shipment details: ' . $e->getMessage());
+            Log::error('Error fetching shipment details: ' . $e->getMessage());
             throw new Exception('Error while fetching shipment details.');
         }
     }

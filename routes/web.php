@@ -17,6 +17,8 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Auth;
 
+Route::get('/print-on-demand', [HomeController::class, 'printondemand'])->name('printondemand');
+
 
     Route::get('/', [CategoryController::class, 'index'])->name('home');
 

@@ -725,7 +725,9 @@ $setting = \App\Models\Setting::find(1);
                      $footerCategories = \App\Models\Category::where('status', 1)->orderBy('order_by', 'asc')->get();
                   @endphp
                   @foreach($footerCategories as $category)
-                     <p class="m-1"><a class="" href="{{ url('products/' . $category->slug) }}">{{ $category->name }}</a></p>
+                    @if ($category->id !=8)
+                        <p class="m-1"><a class="" href="{{ url('products/' . $category->slug) }}">{{ $category->name }}</a></p>
+                    @endif
                   @endforeach
                </div>
                <div class="col-md-2 aboutfot">

@@ -16,6 +16,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use App\Models\PrintDesign;
 
 class ProductController extends Controller
 {
@@ -163,7 +164,14 @@ class ProductController extends Controller
         $data['allproducts'] = $allProducts;
 
         // Render the view with products filtered by subcategory
-        return view('web.products.product_by_category', $data);
+        if ($category->slug === 'print-on-demand') {
+        $data['title'] = 'Print On Demand';
+        $data['subCategory'] = $subCategory;
+        $data['designs'] = PrintDesign::where('subcategory_slug', $subCategory->slug)->where('status',1)->orderBy('position','asc')->get();
+        return view('web.printondemand', $data);
+    }
+
+    return view('web.products.product_by_category', $data);
     }
 
 
@@ -234,16 +242,9 @@ class ProductController extends Controller
             ->get();
 
         // Check coupon
-        $coupons = Coupon::where('status', 1)
+        $data['coupons'] = Coupon::where('status', 1)
             ->whereDate('end_date', '>=', now()) // Check if the coupon is still valid
-            ->get();
-
-        $data['coupons'] = $coupons->filter(function ($coupon) use ($product) {
-            $allowedCategories = !empty($coupon->allow_category) ? explode(',', $coupon->allow_category) : null;
-            // If allow_category is NULL or empty, apply coupon to all products
-            // Otherwise, check if product's category_id is in the allowed categories
-            return $allowedCategories === null || in_array($product->category_id, $allowedCategories);
-        })->first();
+            ->first();
 
         return view('web.products.product_details', $data);
     }
