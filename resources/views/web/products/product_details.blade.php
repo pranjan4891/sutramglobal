@@ -260,6 +260,49 @@ img.card-img-top {
     transition: color 0.3s;
 }
 
+/* Modal styles */
+.modaling {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal__content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 8px;
+    position: relative;
+}
+
+.modal__close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal__close:hover,
+.modal__close:focus {
+    color: black;
+    text-decoration: none;
+}
+
+.modal__title {
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
 
 </style>
 
@@ -533,45 +576,55 @@ img.card-img-top {
    <div id="sizeTableModal" class="modaling">
       <div class="modal__content">
          <span class="modal__close" onclick="closeSizeGuide()">&times;</span>
-         <h5 class="text-center">{{@$size_guider_Name->title}}</h5>
+         <h5 class="text-center">{{@$size_guider_category->name}}</h5>
          <p class="modal__title text-center">Size Guide</p>
-         <table class="table table-bordered text-center">
-            <thead>
-               <tr>
-                  <th></th>
-                  <th>Chest</th>
-                  <th>Length</th>
-                @if(@$size_guider[0]->shoulder!='')
-                  <th>Shoulder</th>
-                @endif
-                  <th>Sleeve Length</th>
-
-                @if(@$size_guider[0]->waist!='')
-                  <th>Waist Size</th>
-                @endif
-               </tr>
-            </thead>
-            <tbody>
-                @if($size_guider)
-                @foreach($size_guider as $val)
-               <tr>
-                  <td>{{$val->size}}</td>
-                  <td>{{$val->chest}}</td>
-                  <td>{{$val->length}}</td>
-                  @if($val->shoulder!='')
-                  <td>{{$val->shoulder}}</td>
-                  @endif
-                  <td>{{$val->sleeve}}</td>
-                  @if($val->waist!='')
-                  <td>{{$val->waist}}</td>
-                  @endif
-
-               </tr>
-                @endforeach
-                @endif
-
-            </tbody>
-         </table>
+         @if($size_guider_groups)
+             @foreach($size_guider_groups as $subCatId => $guiders)
+                 @php
+                     $subCatName = $subCatId !== 'no_sub' ? $guiders->first()->subCategory->name ?? 'Unknown' : 'General';
+                     $hasShoulder = $guiders->where('shoulder', '!=', '')->count() > 0;
+                     $hasSleeve = $guiders->where('sleeve', '!=', '')->count() > 0;
+                     $hasWaist = $guiders->where('waist', '!=', '')->count() > 0;
+                 @endphp
+                 <h6 class="mt-3">{{ $size_guider_category->name }} -> {{ $subCatName }}</h6>
+                 <table class="table table-bordered text-center">
+                    <thead>
+                       <tr>
+                          <th>Size</th>
+                          <th>Chest</th>
+                          <th>Length</th>
+                          @if($hasShoulder)
+                          <th>Shoulder</th>
+                          @endif
+                          @if($hasSleeve)
+                          <th>Sleeve</th>
+                          @endif
+                          @if($hasWaist)
+                          <th>Waist</th>
+                          @endif
+                       </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($guiders as $val)
+                       <tr>
+                          <td>{{$val->size ? $val->size->code : '-'}}</td>
+                          <td>{{$val->chest ?: '-'}}</td>
+                          <td>{{$val->length ?: '-'}}</td>
+                          @if($hasShoulder)
+                          <td>{{$val->shoulder ?: '-'}}</td>
+                          @endif
+                          @if($hasSleeve)
+                          <td>{{$val->sleeve ?: '-'}}</td>
+                          @endif
+                          @if($hasWaist)
+                          <td>{{$val->waist ?: '-'}}</td>
+                          @endif
+                       </tr>
+                        @endforeach
+                    </tbody>
+                 </table>
+             @endforeach
+         @endif
       </div>
    </div>
 </section>
@@ -822,6 +875,14 @@ img.card-img-top {
 <script type="text/javascript">
     function openPopup() {
         window.location.href = "#popup1"; // Redirects to the popup section
+    }
+
+    function openSizeGuide() {
+        document.getElementById('sizeTableModal').style.display = 'block';
+    }
+
+    function closeSizeGuide() {
+        document.getElementById('sizeTableModal').style.display = 'none';
     }
     $(document).ready(function() {
         // Star rating click event

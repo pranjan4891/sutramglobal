@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Coupon;
+use App\Models\Category;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -21,6 +22,7 @@ class CouponController extends Controller
     {
         $data['title'] = 'Coupons';
         $data['action'] = 'Add';
+        $data['categories'] = Category::where('status', 1)->get();
         return view('admin.coupon.manage', $data);
     }
 
@@ -29,6 +31,7 @@ class CouponController extends Controller
         $data['title'] = 'Coupons';
         $data['action'] = 'Edit';
         $data['coupon'] = Coupon::find($id);
+        $data['categories'] = Category::where('status', 1)->get();
         return view('admin.coupon.manage', $data);
     }
 
@@ -77,7 +80,8 @@ class CouponController extends Controller
         $model->end_date = $request->end_date;
         $model->usage_limit = $request->usage_limit ?? null;
         $model->usage_per_customer = $request->usage_per_customer ?? null;
-        $model->description=$request->description;
+        $model->description = $request->description;
+        $model->allow_category = !empty($request->allow_category) ? implode(',', $request->allow_category) : null;
         $model->status = $request->status;
 
         $model->save();

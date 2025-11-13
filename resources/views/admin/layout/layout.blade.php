@@ -7,7 +7,8 @@
     <title>Admin | {{ $pageTitle }}</title>
     <link rel="icon" type="image/png" href="{{asset('public/img/FaviconIcon.jpg')}}">
 
-
+<link rel="stylesheet" href="{{ asset('public/admin/plugins/select2/css/select2.min.css') }}">
+<link rel="stylesheet" href="{{ asset('public/admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
     @include('admin.layout.path_css')
 
 </head>

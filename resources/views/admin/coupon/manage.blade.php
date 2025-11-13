@@ -1,5 +1,6 @@
 @extends('admin.layout.layout', ['pageTitle' => $action . ' ' . $title])
 @section('contant')
+
 <div class="container-fluid">
     <style>
         .form-label {
@@ -112,13 +113,40 @@
                             </div>
                         </div>
 
+                        <!-- Allowed Categories -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group bg-lightblue disabled color-palette px-2 pt-1">
+                                    <label>Allowed Categories:</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="allow_category" class="form-label">Select Categories (Optional)</label>
+                                    @php
+                                        $selectedCategories = old('allow_category', !empty($coupon->allow_category) ? explode(',', $coupon->allow_category) : []);
+                                    @endphp
+                                    <select name="allow_category[]" id="allow_category" class="form-control" multiple>
+                                        @if(!empty($categories))
+                                            @foreach($categories as $category)
+                                                <option value="{{ $category->id }}" {{ in_array($category->id, $selectedCategories) ? 'selected' : '' }}>
+                                                    {{ $category->name }}
+                                                </option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                    <small class="form-text text-muted">Leave empty to allow for all categories.</small>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Status -->
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="description">Description</label>
                                     <textarea class="form-control" name="description" id="description"
-                                              placeholder="Please enter description">{{ !empty($coupon->description) ? $coupon->description : '' }}</textarea>
+                                              placeholder="Please enter description">{!! old('description', !empty($coupon->description) ? $coupon->description : '') !!}</textarea>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -148,13 +176,67 @@
 </div>
 @endsection
 @push('sub-script')
-    <script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
     <script type="text/javascript">
-        // Initialize CKEditor
-        ClassicEditor
-            .create(document.querySelector('#description'))
-            .catch(error => {
-                console.error(error);
+        (function() {
+            function initFormEnhancements() {
+                if (typeof CKEDITOR !== 'undefined') {
+                    if (CKEDITOR.instances.description) {
+                        CKEDITOR.instances.description.destroy(true);
+                    }
+                    CKEDITOR.replace('description');
+                }
+
+                const $categorySelect = $('#allow_category');
+                const selectedValues = @json($selectedCategories ?? []);
+
+                $categorySelect.select2({
+                    placeholder: 'Select categories',
+                    allowClear: true,
+                    width: '100%',
+                    theme: 'bootstrap4',
+                    templateResult: function (data) {
+                        if (!data.id) {
+                            return data.text;
+                        }
+                        if ($(data.element).prop('selected')) {
+                            return null;
+                        }
+                        return data.text;
+                    },
+                    templateSelection: function (data) {
+                        return data.text;
+                    }
+                });
+
+                if (selectedValues.length) {
+                    $categorySelect.val(selectedValues).trigger('change');
+                }
+
+                $('#coupon-form').on('submit', function () {
+                    if (typeof CKEDITOR !== 'undefined') {
+                        for (const instance in CKEDITOR.instances) {
+                            if (Object.prototype.hasOwnProperty.call(CKEDITOR.instances, instance)) {
+                                CKEDITOR.instances[instance].updateElement();
+                            }
+                        }
+                    }
+                });
+            }
+
+            function loadCkEditor(callback) {
+                if (typeof CKEDITOR !== 'undefined') {
+                    callback();
+                    return;
+                }
+                const script = document.createElement('script');
+                script.src = 'https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js';
+                script.onload = callback;
+                document.head.appendChild(script);
+            }
+
+            $(document).ready(function() {
+                loadCkEditor(initFormEnhancements);
             });
+        })();
     </script>
 @endpush

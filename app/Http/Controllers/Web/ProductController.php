@@ -9,6 +9,7 @@ use App\Models\SubCategory;
 use App\Models\Color;
 use App\Models\Coupon;
 use App\Models\Size;
+use App\Models\SizeGuider;
 use App\Models\Wishlist;
 use App\Models\Review;
 use Illuminate\Http\Request;
@@ -188,7 +189,7 @@ class ProductController extends Controller
         ->get();
 
         // Fetch the product using the slug
-        $product = Product::where('slug', $Slug)->firstOrFail();
+        $product = Product::with('category')->where('slug', $Slug)->firstOrFail();
        // \DB::enableQueryLog();
         $product->increment('views');
        // dd(\DB::getQueryLog());
@@ -232,14 +233,20 @@ class ProductController extends Controller
         }
 
         // Size guide information
-        $data['size_guider_Name'] = DB::table('size_catergory')
-            ->select('title')
-            ->where('id', $product->size_guider_id)
-            ->first();
+        $data['size_guider_category'] = $product->category;
 
-        $data['size_guider'] = DB::table('size_guider')
-            ->where('size_cat_id', $product->size_guider_id)
+        $sizeGuiders = SizeGuider::with(['size', 'subCategory'])
+            ->where('cat_id', $product->category_id)
+            ->where('sub_cat_id', $product->subcategory_id)
+            ->orderBy('sub_cat_id')
             ->get();
+
+        // Group by sub category
+        $groupedSizeGuiders = $sizeGuiders->groupBy(function ($item) {
+            return $item->sub_cat_id ?: 'no_sub';
+        });
+
+        $data['size_guider_groups'] = $groupedSizeGuiders;
 
         // Check coupon
         $data['coupons'] = Coupon::where('status', 1)

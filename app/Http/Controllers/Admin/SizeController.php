@@ -34,17 +34,17 @@ class SizeController extends Controller
         $edit_id = $request->edit_id;
         $validator = Validator::make($request->all(),
             [
+                'sort' => 'required|integer',
+                'name' => 'required',
                 'code' => 'required',
-                'category' => 'required',
-                'type' => 'required',
-                'chest' => 'required',
-                'waist' => 'required',
-                'length' => 'required',
+                'status' => 'required|in:0,1',
             ],[
-
-                'code.required' => 'code is required',
-                'code.regex' => 'code should not contain special characters',
-                'code.unique' => 'code already exists',
+                'sort.required' => 'Sort is required',
+                'sort.integer' => 'Sort must be a number',
+                'name.required' => 'Name is required',
+                'code.required' => 'Code is required',
+                'status.required' => 'Status is required',
+                'status.in' => 'Invalid status value',
             ]
         );
         if ($validator->fails()) {
@@ -52,18 +52,16 @@ class SizeController extends Controller
         }
         if (!empty($edit_id)) {
             $model = Size::where('id', $edit_id)->first();
-            $message = 'Success! Sizes updated';
+            $message = 'Success! Size updated';
         } else {
             $model = new Size();
-            $message = 'Success! Sizes added';
+            $message = 'Success! Size added';
         }
 
+        $model->sort = $request->sort;
+        $model->name = $request->name;
         $model->code = $request->code;
-        $model->category = $request->category;
-        $model->type = $request->type;
-        $model->chest = $request->chest;
-        $model->waist = $request->waist;
-        $model->length = $request->length;
+        $model->status = $request->status;
         $model->save();
         return redirect()->route('admin.sizes')->with('success', $message);
     }
@@ -112,7 +110,7 @@ class SizeController extends Controller
     // }
     public function getList()
     {
-        $columns = array('id', 'code', 'chest', 'waist', 'length', 'type', 'category', 'id');
+        $columns = array('id', 'sort', 'name', 'code', 'status');
 
         // Select columns from Size model
         $row = Size::select($columns)->where('id', '>', 0);
@@ -124,9 +122,9 @@ class SizeController extends Controller
         if (!empty($_POST['search']['value'])) {
             $search = $_POST['search']['value'];
             $row->where(function ($query) use ($search) {
-                $query->where('code', 'LIKE', '%' . $search . '%')
-                    ->orWhere('category', 'LIKE', '%' . $search . '%')
-                    ->orWhere('type', 'LIKE', '%' . $search . '%');
+                $query->where('sort', 'LIKE', '%' . $search . '%')
+                    ->orWhere('name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('code', 'LIKE', '%' . $search . '%');
             });
         }
 
@@ -147,14 +145,14 @@ class SizeController extends Controller
             $action = '<a class="btn btn-primary btn-sm" href="' . route('admin.sizes.edit', $value->id) . '"><i class="fa fa-edit"></i></a>';
             $action .= '<a href="javascript:void(0)" data-id="' . $value->id . '" class="btn btn-danger btn-sm ml-1 delete"><i class="fa fa-trash"></i></a>';
 
+            $status = $value->status == 1 ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Inactive</span>';
+
             $sub_array = array();
             $sub_array[] = ++$key; // Increment the key to represent the index
+            $sub_array[] = $value->sort;
+            $sub_array[] = $value->name;
             $sub_array[] = $value->code;
-            $sub_array[] = $value->category;
-            $sub_array[] = $value->type;
-            $sub_array[] = $value->chest;
-            $sub_array[] = $value->waist;
-            $sub_array[] = $value->length;
+            $sub_array[] = $status;
             $sub_array[] = $action;
             $data[] = $sub_array;
         }
@@ -184,9 +182,8 @@ class SizeController extends Controller
     public function delete(Request $request)
     {
         $id = $request->id;
-        $model = Sizes::find($id);
+        $model = Size::find($id);
         $model->delete();
         return response()->json('success');
-
     }
 }

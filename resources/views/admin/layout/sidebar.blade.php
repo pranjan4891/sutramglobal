@@ -64,6 +64,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="{{ route('admin.size_guiders') }}" class="nav-link {{ $menu . '/' . $subMenu == 'masters/size-guiders' ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Size Guiders</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{{ route('admin.masters.category') }}" class="nav-link {{ $menu . '/' . $subMenu == 'masters/categories' ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Categories</p>

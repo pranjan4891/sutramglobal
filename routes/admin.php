@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ColorController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\SizeController;
+use App\Http\Controllers\Admin\SizeGuiderController;
 use App\Http\Controllers\Admin\MastersController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrdersController;
@@ -149,6 +150,15 @@ Route::group(['prefix' => 'admin'], function () {
                 Route::post('status', [SizeController::class, 'status'])->name('admin.sizes.status');
                 Route::post('delete', [SizeController::class,'delete'])->name('admin.sizes.delete');
             });
+            Route::prefix('size-guiders')->group(function () {
+                Route::get('/', [SizeGuiderController::class, 'index'])->name('admin.size_guiders');
+                Route::post('list', [SizeGuiderController::class, 'getList'])->name('admin.size_guiders.getList');
+                Route::get('add', [SizeGuiderController::class, 'add'])->name('admin.size_guiders.add');
+                Route::post('store', [SizeGuiderController::class, 'store'])->name('admin.size_guiders.store');
+                Route::get('edit/{id}', [SizeGuiderController::class, 'edit'])->name('admin.size_guiders.edit');
+                Route::post('delete', [SizeGuiderController::class,'delete'])->name('admin.size_guiders.delete');
+                Route::post('get-subcategories', [SizeGuiderController::class, 'getSubCategories'])->name('admin.size_guiders.getSubCategories');
+            });
 
             Route::prefix('categories')->group(function () {
                 Route::get('/', [MastersController::class, 'category'])->name('admin.masters.category');
@@ -217,4 +227,3 @@ Route::group(['prefix' => 'admin'], function () {
     });
 
 });
-

@@ -9,8 +9,7 @@ class Size extends Model
 {
     use HasFactory;
 
-    protected $table = 'sizes'; // Ensure table name matches your database
-    protected $guarded = ['id'];
-    protected $fillable = ['id', 'sort', 'code', 'category', 'type', 'chest', 'waist', 'length'];
+    protected $table = 'sizes';
+    protected $fillable = ['id','sort', 'name', 'code', 'status' ];
 }
 
